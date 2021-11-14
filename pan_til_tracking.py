@@ -23,10 +23,11 @@ def signal_handler(sig, frame):
 	# print a status message
 	print("[INFO] You pressed `ctrl + c`! Exiting...")
 	# disable the servos
-	# non usando pantilthat e
-	# usando direttamente GPIO della Raspberry disabilito i GPIO con cleanup
-	# forse potrei mettere come IN i soli GPIO usati in questo programma
-	GPIO.Cleanup()
+	# non usando pantilthat setto a 0 il duty per isolare i servi_xy
+	# forse essendo una interruzione completa potrei
+	# sostiruire l'istruzione con un GPIO.cleanup()
+	ser.setdcx(0)
+	ser.setdcy(0)
 	#pth.servo_enable(1, False)
 	#pth.servo_enable(2, False)
 	# exit
@@ -183,5 +184,6 @@ if __name__ == "__main__":
 		# disable the servos
 		#pth.servo_enable(1, False)
 		#pth.servo_enable(2, False)
-		# non usando pantilthat devo abilitare i GPIO
-		GPIO.cleanup()
+		# non usando pantilthat setto a 0 la PWM dei servi_xy
+		ser.setdcx(0)
+		ser.setdcy(0)
