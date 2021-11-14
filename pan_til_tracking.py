@@ -19,8 +19,12 @@ def signal_handler(sig, frame):
 	# print a status message
 	print("[INFO] You pressed `ctrl + c`! Exiting...")
 	# disable the servos
-	pth.servo_enable(1, False)
-	pth.servo_enable(2, False)
+	# non usando pantilthat e 
+	# usando direttamente GPIO della Raspberry disabilito i GPIO con cleanup
+	# forse potrei mettere come IN i soli GPIO usati in questo programma
+	GPIO.Cleanup()
+	#pth.servo_enable(1, False)
+	#pth.servo_enable(2, False)
 	# exit
 	sys.exit()
 
@@ -31,7 +35,10 @@ def obj_center(args, objX, objY, centerX, centerY):
 	signal.signal(signal.SIGINT, signal_handler)
 
 	# start the video stream and wait for the camera to warm up
-	vs = VideoStream(usePiCamera=True).start()
+	# leggo dalla camera USB senza passare per le imutils.video
+	# vs = cv2.VideoCapture(0)
+	# altrimenti uso VideoStream di imutils.video mettendo usePiCamera=False
+	vs = VideoStream(usePiCamera=False).start()
 	time.sleep(2.0)
 
 	# initialize the object center finder
@@ -113,8 +120,10 @@ if __name__ == "__main__":
 	# start a manager for managing process-safe variables
 	with Manager() as manager:
 		# enable the servos
-		pth.servo_enable(1, True)
-		pth.servo_enable(2, True)
+		#pth.servo_enable(1, True)
+		#pth.servo_enable(2, True)
+		# non usando la libreria pantilthat devo abilitare i GPIO
+		GPIO
 
 		# set integer values for the object center (x, y)-coordinates
 		centerX = manager.Value("i", 0)
@@ -165,5 +174,7 @@ if __name__ == "__main__":
 		processSetServos.join()
 
 		# disable the servos
-		pth.servo_enable(1, False)
-		pth.servo_enable(2, False)
+		#pth.servo_enable(1, False)
+		#pth.servo_enable(2, False)
+		# non usando pantilthat devo abilitare i GPIO
+		GPIO.cleanup()
