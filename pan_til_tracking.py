@@ -5,6 +5,8 @@ from imutils.video import VideoStream
 from inseguitore_1.objcenter import ObjCenter
 from inseguitore_1.pid import PID
 import pantilthat as pth
+#importo la libreria per gestire i servi_xy
+import servomove
 import argparse
 import signal
 import time
@@ -13,13 +15,15 @@ import cv2
 
 # define the range for the motors
 servoRange = (-90, 90)
+#creo l'ogetto servos
+ser=servopos()
 
 # function to handle keyboard interrupt
 def signal_handler(sig, frame):
 	# print a status message
 	print("[INFO] You pressed `ctrl + c`! Exiting...")
 	# disable the servos
-	# non usando pantilthat e 
+	# non usando pantilthat e
 	# usando direttamente GPIO della Raspberry disabilito i GPIO con cleanup
 	# forse potrei mettere come IN i soli GPIO usati in questo programma
 	GPIO.Cleanup()
@@ -103,11 +107,13 @@ def set_servos(pan, tlt):
 
 		# if the pan angle is within the range, pan
 		if in_range(panAngle, servoRange[0], servoRange[1]):
-			pth.pan(panAngle)
+			#pth.pan(panAngle)
+			ser.setposx(panAngle)
 
 		# if the tilt angle is within the range, tilt
 		if in_range(tiltAngle, servoRange[0], servoRange[1]):
-			pth.tilt(tiltAngle)
+			#pth.tilt(tiltAngle)
+			ser.setposy(tiltAngle)
 
 # check to see if this is the main body of execution
 if __name__ == "__main__":
@@ -123,7 +129,8 @@ if __name__ == "__main__":
 		#pth.servo_enable(1, True)
 		#pth.servo_enable(2, True)
 		# non usando la libreria pantilthat devo abilitare i GPIO
-		GPIO
+		ser.setdcx(0)
+		ser.setdcy(0)
 
 		# set integer values for the object center (x, y)-coordinates
 		centerX = manager.Value("i", 0)
