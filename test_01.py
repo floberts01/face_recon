@@ -6,7 +6,7 @@ from objcenter import ObjCenter
 from pid import PID
 #import pantilthat as pth
 #importo la libreria per gestire i servi_xy
-import servomove
+#import servomove
 import argparse
 import signal
 import time
@@ -14,9 +14,9 @@ import sys
 import cv2
 
 # define the range for the motors
-servoRange = (-90, 90)
+#servoRange = (-90, 90)
 #creo l'ogetto servos
-ser=servopos()
+#ser=servopos()
 
 # function to handle keyboard interrupt
 def signal_handler(sig, frame):
@@ -26,8 +26,8 @@ def signal_handler(sig, frame):
 	# non usando pantilthat setto a 0 il duty per isolare i servi_xy
 	# forse essendo una interruzione completa potrei
 	# sostiruire l'istruzione con un GPIO.cleanup()
-	ser.setdcx(0)
-	ser.setdcy(0)
+	#ser.setdcx(0)
+	#ser.setdcy(0)
 	#pth.servo_enable(1, False)
 	#pth.servo_enable(2, False)
 	# exit
@@ -54,7 +54,7 @@ def obj_center(args, objX, objY, centerX, centerY):
 		# grab the frame from the threaded video stream and flip it
 		# vertically (since our camera was upside down)
 		frame = vs.read()
-		frame = cv2.flip(frame, 0)
+		#frame = cv2.flip(frame, 0)
 
 		# calculate the center of the frame as this is where we will
 		# try to keep the object
@@ -88,39 +88,41 @@ def pid_process(output, p, i, d, objCoord, centerCoord):
 	while True:
 		# calculate the error
 		error = centerCoord.value - objCoord.value
+		 
 
 		# update the value
 		output.value = p.update(error)
+		
 
 def in_range(val, start, end):
 	# determine the input value is in the supplied range
 	return (val >= start and val <= end)
 
-def set_servos(pan, tlt):
-	# signal trap to handle keyboard interrupt
-	signal.signal(signal.SIGINT, signal_handler)
-
-	# loop indefinitely
-	while True:
-		# the pan and tilt angles are reversed
-		panAngle = -1 * pan.value
-		tiltAngle = -1 * tlt.value
-
-		# if the pan angle is within the range, pan
-		if in_range(panAngle, servoRange[0], servoRange[1]):
-			#pth.pan(panAngle)
-			ser.setposx(panAngle)
-
-		# if the tilt angle is within the range, tilt
-		if in_range(tiltAngle, servoRange[0], servoRange[1]):
-			#pth.tilt(tiltAngle)
-			ser.setposy(tiltAngle)
+##def set_servos(pan, tlt):
+##	# signal trap to handle keyboard interrupt
+##	signal.signal(signal.SIGINT, signal_handler)
+##
+##	# loop indefinitely
+##	while True:
+##		# the pan and tilt angles are reversed
+##		panAngle = -1 * pan.value
+##		tiltAngle = -1 * tlt.value
+##
+##		# if the pan angle is within the range, pan
+##		if in_range(panAngle, servoRange[0], servoRange[1]):
+##			#pth.pan(panAngle)
+##			ser.setposx(panAngle)
+##
+##		# if the tilt angle is within the range, tilt
+##		if in_range(tiltAngle, servoRange[0], servoRange[1]):
+##			#pth.tilt(tiltAngle)
+##			ser.setposy(tiltAngle)
 
 # check to see if this is the main body of execution
 if __name__ == "__main__":
 	# construct the argument parser and parse the arguments
 	ap = argparse.ArgumentParser()
-	ap.add_argument("-c", "--cascade", type=str, required=True,
+	ap.add_argument("-c", "--cascade", type=str, required=False,
 		help="path to input Haar cascade for face detection")
 	args = vars(ap.parse_args())
 
@@ -130,8 +132,8 @@ if __name__ == "__main__":
 		#pth.servo_enable(1, True)
 		#pth.servo_enable(2, True)
 		# non usando la libreria pantilthat devo abilitare i GPIO
-		ser.setdcx(0)
-		ser.setdcy(0)
+		#ser.setdcx(0)
+		#ser.setdcy(0)
 
 		# set integer values for the object center (x, y)-coordinates
 		centerX = manager.Value("i", 0)
@@ -167,23 +169,23 @@ if __name__ == "__main__":
 			args=(pan, panP, panI, panD, objX, centerX))
 		processTilting = Process(target=pid_process,
 			args=(tlt, tiltP, tiltI, tiltD, objY, centerY))
-		processSetServos = Process(target=set_servos, args=(pan, tlt))
+		#processSetServos = Process(target=set_servos, args=(pan, tlt))
 
 		# start all 4 processes
 		processObjectCenter.start()
 		processPanning.start()
 		processTilting.start()
-		processSetServos.start()
+		#processSetServos.start()
 
 		# join all 4 processes
 		processObjectCenter.join()
 		processPanning.join()
 		processTilting.join()
-		processSetServos.join()
+		#processSetServos.join()
 
 		# disable the servos
 		#pth.servo_enable(1, False)
 		#pth.servo_enable(2, False)
 		# non usando pantilthat setto a 0 la PWM dei servi_xy
-		ser.setdcx(0)
-		ser.setdcy(0)
+		#ser.setdcx(0)
+		#ser.setdcy(0)
