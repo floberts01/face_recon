@@ -4,7 +4,8 @@ import cv2
 class ObjCenter:
 	def __init__(self, haarPath):
 		# load OpenCV's Haar cascade face detector
-		self.detector = cv2.CascadeClassifier(haarPath)
+		#self.detector = cv2.CascadeClassifier(haarPath)
+		self.detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 	def update(self, frame, frameCenter):
 		# convert the frame to grayscale
